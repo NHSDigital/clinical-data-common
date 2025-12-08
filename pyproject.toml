@@ -1,0 +1,34 @@
+[project]
+name = "clinical-data-common"
+version = "0.1.0"
+description = "Common code used across various clinical data API products"
+authors = [
+    {name = "NHS Digital", email = ""}
+]
+readme = "README.md"
+requires-python = ">3.13,<4.0.0"
+dependencies = []
+
+[tool.poetry]
+packages = [{include = "clinical_data_common", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-html>=4.1.1,<5.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+]

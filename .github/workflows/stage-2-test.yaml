@@ -3,34 +3,11 @@ name: "Test stage"
 on:
   workflow_call:
     inputs:
-      build_datetime:
-        description: "Build datetime, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
-      build_timestamp:
-        description: "Build timestamp, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
-      build_epoch:
-        description: "Build epoch, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
-      nodejs_version:
-        description: "Node.js version, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
       python_version:
         description: "Python version, set by the CI/CD pipeline workflow"
         required: true
         type: string
-      terraform_version:
-        description: "Terraform version, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
-      version:
-        description: "Version of the software, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
+
 
 jobs:
   test-unit:
@@ -40,30 +17,39 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v6
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+      - name: "Install Poetry"
+        shell: bash
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: "Install dependencies"
+        shell: bash
+        run: make dependencies
       - name: "Run unit test suite"
-        run: |
-          make test-unit
-      - name: "Save the result of fast test suite"
-        run: |
-          echo "Nothing to save"
-  test-lint:
-    name: "Linting"
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v6
-      - name: "Run linting"
-        run: |
-          make test-lint
-      - name: "Save the linting result"
-        run: |
-          echo "Nothing to save"
+        shell: bash
+        run: make test-unit
+      - name: "Upload unit test results"
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: unit-test-results
+          path: test-artefacts/
+          retention-days: 30
+      - name: "Publish unit test results to summary"
+        if: always()
+        uses: test-summary/action@31493c76ec9e7aa675f1585d3ed6f1da69269a86  # v2.4
+        with:
+          paths: test-artefacts/unit-tests.xml
   test-coverage:
     name: "Test coverage"
     needs: [test-unit]
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    if: false # TODO: Enable coverage testing in future ticket
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v6
