@@ -110,7 +110,7 @@ make test-unit
 Or directly with Poetry:
 
 ```shell
-poetry run pytest tests/
+poetry run pytest src/
 ```
 
 ## Design
