@@ -94,7 +94,7 @@ from clinical_data_common import get_hello
 # Use the greeting function
 greeting = get_hello()
 message = f"{greeting}World"
-print(message)  # Output: Hello World
+print(message)  # Output: Hello, World
 ```
 
 ### Testing

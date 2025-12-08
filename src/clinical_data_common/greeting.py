@@ -9,12 +9,12 @@ def get_hello() -> str:
     """Return a greeting string.
 
     Returns:
-        str: The string 'Hello '
+        str: The string 'Hello, '
 
     Example:
         >>> from clinical_data_common import get_hello
         >>> message = get_hello()
         >>> print(f"{message}World")
-        Hello World
+        Hello, World
     """
-    return "Hello "
+    return "Hello, "

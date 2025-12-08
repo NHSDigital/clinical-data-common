@@ -8,9 +8,9 @@ class TestGetHello:
     """Test suite for the get_hello function."""
 
     def test_get_hello_returns_correct_string(self):
-        """Test that get_hello returns 'Hello ' exactly."""
+        """Test that get_hello returns 'Hello, ' exactly."""
         result = get_hello()
-        assert result == "Hello "
+        assert result == "Hello, "
 
     def test_get_hello_returns_string_type(self):
         """Test that get_hello returns a string type."""
@@ -26,4 +26,4 @@ class TestGetHello:
         """Test that get_hello can be concatenated with other strings."""
         result = get_hello()
         full_message = f"{result}World"
-        assert full_message == "Hello World"
+        assert full_message == "Hello, World"
