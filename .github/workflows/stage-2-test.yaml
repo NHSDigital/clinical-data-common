@@ -59,8 +59,8 @@ jobs:
       - name: "Download unit test coverage report"
         uses: actions/download-artifact@v6
         with:
-          name: coverage.xml
-          path: unit-test-results/
+          name: unit-test-results
+          path: test-artefacts/
       - name: "SonarCloud Scan"
         uses: SonarSource/sonarqube-scan-action@v6
         env:
