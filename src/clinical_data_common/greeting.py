@@ -1,6 +1,6 @@
 """Greeting module for clinical-data-common.
 
-This module provides simple greeting functions that can be used across
+This module provides a simple greeting function that can be used across
 clinical data API products.
 """
 
