@@ -60,7 +60,7 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: coverage.xml
-          path: test-artefacts/
+          path: unit-test-results/
       - name: "SonarCloud Scan"
         uses: SonarSource/sonarqube-scan-action@v6
         env:
