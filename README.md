@@ -123,6 +123,7 @@ poetry run pytest --cov=clinical_data_common --cov-report=term --cov-report=html
 ```
 
 This will generate:
+
 - A terminal coverage report showing coverage percentages
 - An HTML coverage report in the `htmlcov/` directory
 
@@ -139,6 +140,7 @@ This project uses [SonarCloud](https://sonarcloud.io) for continuous code qualit
 #### SonarCloud Integration
 
 SonarCloud analyzes:
+
 - Code quality and maintainability
 - Security vulnerabilities
 - Code coverage from unit tests
@@ -149,6 +151,7 @@ The Quality Gate status is displayed at the top of this README. You can view det
 #### CI/CD Pipeline
 
 The test pipeline (`.github/workflows/stage-2-test.yaml`) automatically:
+
 1. Runs unit tests with coverage
 2. Generates coverage reports in XML format
 3. Uploads coverage data to SonarCloud
