@@ -14,6 +14,7 @@ The `clinical-data-common` repository provides a centralized repository for comm
     - [Configuration](#configuration)
   - [Usage](#usage)
     - [Testing](#testing)
+    - [Code Quality](#code-quality)
   - [Design](#design)
     - [Diagrams](#diagrams)
     - [Modularity](#modularity)
@@ -112,6 +113,48 @@ Or directly with Poetry:
 ```shell
 poetry run pytest src/
 ```
+
+#### Running Tests with Coverage
+
+To run tests with code coverage reporting:
+
+```shell
+poetry run pytest --cov=clinical_data_common --cov-report=term --cov-report=html src/
+```
+
+This will generate:
+- A terminal coverage report showing coverage percentages
+- An HTML coverage report in the `htmlcov/` directory
+
+To view the HTML coverage report:
+
+```shell
+open htmlcov/index.html
+```
+
+### Code Quality
+
+This project uses [SonarCloud](https://sonarcloud.io) for continuous code quality and security analysis. The analysis runs automatically as part of the CI/CD pipeline on every pull request.
+
+#### SonarCloud Integration
+
+SonarCloud analyzes:
+- Code quality and maintainability
+- Security vulnerabilities
+- Code coverage from unit tests
+- Code smells and technical debt
+
+The Quality Gate status is displayed at the top of this README. You can view detailed analysis reports on the [SonarCloud dashboard](https://sonarcloud.io/summary/new_code?id=clinical-data-common).
+
+#### CI/CD Pipeline
+
+The test pipeline (`.github/workflows/stage-2-test.yaml`) automatically:
+1. Runs unit tests with coverage
+2. Generates coverage reports in XML format
+3. Uploads coverage data to SonarCloud
+4. Performs static code analysis
+
+Coverage reports are sent to SonarCloud and must meet the quality gate thresholds for pull requests to be merged.
 
 ## Design
 
