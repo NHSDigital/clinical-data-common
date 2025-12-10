@@ -14,6 +14,7 @@ The `clinical-data-common` repository provides a centralized repository for comm
     - [Configuration](#configuration)
   - [Usage](#usage)
     - [Testing](#testing)
+    - [Code Quality](#code-quality)
   - [Design](#design)
     - [Diagrams](#diagrams)
     - [Modularity](#modularity)
@@ -23,21 +24,19 @@ The `clinical-data-common` repository provides a centralized repository for comm
 
 ## Setup
 
-By including preferably a one-liner or if necessary a set of clear CLI instructions we improve user experience. This should be a frictionless installation process that works on various operating systems (macOS, Linux, Windows WSL) and handles all the dependencies.
-
-Clone the repository
+Clone the repository:
 
 ```shell
-git clone https://github.com/nhs-england-tools/repository-template.git
-cd nhs-england-tools/repository-template
+git clone https://github.com/NHSDigital/clinical-data-common.git
+cd clinical-data-common
 ```
 
 ### Prerequisites
 
 The following software packages, or their equivalents, are expected to be installed and configured:
 
-- [Docker](https://www.docker.com/) container runtime or a compatible tool, e.g. [Podman](https://podman.io/),
-- [asdf](https://asdf-vm.com/) version manager,
+- [Python](https://www.python.org/) 3.13 or later,
+- [Poetry](https://python-poetry.org/) for dependency management,
 - [GNU make](https://www.gnu.org/software/make/) 3.82 or later,
 
 > [!NOTE]<br>
@@ -49,30 +48,116 @@ The following software packages, or their equivalents, are expected to be instal
 >
 > You will then see instructions to fix your [`$PATH`](https://github.com/nhs-england-tools/dotfiles/blob/main/dot_path.tmpl) variable to make the newly installed version available. If you are using [dotfiles](https://github.com/nhs-england-tools/dotfiles), this is all done for you.
 
-- [GNU sed](https://www.gnu.org/software/sed/) and [GNU grep](https://www.gnu.org/software/grep/) are required for the scripted command-line output processing,
-- [GNU coreutils](https://www.gnu.org/software/coreutils/) and [GNU binutils](https://www.gnu.org/software/binutils/) may be required to build dependencies like Python, which may need to be compiled during installation,
-
-> [!NOTE]<br>
-> For macOS users, installation of the GNU toolchain has been scripted and automated as part of the `dotfiles` project. Please see this [script](https://github.com/nhs-england-tools/dotfiles/blob/main/assets/20-install-base-packages.macos.sh) for details.
-
-- [Python](https://www.python.org/) required to run Git hooks,
-- [`jq`](https://jqlang.github.io/jq/) a lightweight and flexible command-line JSON processor.
-
 ### Configuration
 
-Installation and configuration of the toolchain dependencies
+Install dependencies:
 
 ```shell
-make config
+make dependencies
 ```
 
 ## Usage
 
-After a successful installation, provide an informative example of how this project can be used. Additional code snippets, screenshots and demos work well in this space. You may also link to the other documentation resources, e.g. the [User Guide](./docs/user-guide.md) to demonstrate more use cases and to show more features.
+This package provides common utilities and functions for clinical data API products. It is designed to be imported as a dependency into other projects like `clinical-data-gateway-api`.
+
+### Installing as a Dependency
+
+To use `clinical-data-common` in your project, you can install it using Poetry:
+
+#### Install from Git Repository
+
+Add the following to your `pyproject.toml`:
+
+```toml
+[tool.poetry.dependencies]
+clinical-data-common = { git = "https://github.com/NHSDigital/clinical-data-common.git", branch = "main" }
+```
+
+Or install via command line:
+
+```shell
+poetry add git+https://github.com/NHSDigital/clinical-data-common.git
+```
+
+You can also install a specific Tag/Version:
+
+```shell
+poetry add git+https://github.com/NHSDigital/clinical-data-common.git@v0.1.0
+```
+
+### Using the Module
+
+Once installed, you can import and use the functions from `clinical-data-common` as follows:
+
+```python
+from clinical_data_common import get_hello
+
+# Use the greeting function
+greeting = get_hello()
+message = f"{greeting}World"
+print(message)  # Output: Hello, World
+```
 
 ### Testing
 
 There are `make` tasks for you to configure to run your tests.  Run `make test` to see how they work.  You should be able to use the same entry points for local development as in your CI pipeline.
+
+#### Running Unit Tests
+
+```shell
+make test-unit
+```
+
+Or directly with Poetry:
+
+```shell
+poetry run pytest src/
+```
+
+#### Running Tests with Coverage
+
+To run tests with code coverage reporting:
+
+```shell
+poetry run pytest --cov=clinical_data_common --cov-report=term --cov-report=html src/
+```
+
+This will generate:
+
+- A terminal coverage report showing coverage percentages
+- An HTML coverage report in the `htmlcov/` directory
+
+To view the HTML coverage report:
+
+```shell
+open htmlcov/index.html
+```
+
+### Code Quality
+
+This project uses [SonarCloud](https://sonarcloud.io) for continuous code quality and security analysis. The analysis runs automatically as part of the CI/CD pipeline on every pull request.
+
+#### SonarCloud Integration
+
+SonarCloud analyzes:
+
+- Code quality and maintainability
+- Security vulnerabilities
+- Code coverage from unit tests
+- Code smells and technical debt
+
+The Quality Gate status is displayed at the top of this README. You can view detailed analysis reports on the [SonarCloud dashboard](https://sonarcloud.io/summary/new_code?id=clinical-data-common).
+
+#### CI/CD Pipeline
+
+The test pipeline (`.github/workflows/stage-2-test.yaml`) automatically:
+
+1. Runs unit tests with coverage
+2. Generates coverage reports in XML format
+3. Uploads coverage data to SonarCloud
+4. Performs static code analysis
+
+Coverage reports are sent to SonarCloud and must meet the quality gate thresholds for pull requests to be merged.
 
 ## Design
 

@@ -7,14 +7,16 @@ include scripts/init.mk
 
 # Example CI/CD targets are: dependencies, build, publish, deploy, clean, etc.
 
+.PHONY: dependencies build publish
+
 dependencies: # Install dependencies needed to build and test the project @Pipeline
-	# TODO: Implement installation of your project dependencies
+	poetry sync
 
 build: # Build the project artefact @Pipeline
-	# TODO: Implement the artefact build step
+	poetry build
 
 publish: # Publish the project artefact @Pipeline
-	# TODO: Implement the artefact publishing step
+	poetry publish
 
 deploy: # Deploy the project artefact to the target environment @Pipeline
 	# TODO: Implement the artefact deployment step

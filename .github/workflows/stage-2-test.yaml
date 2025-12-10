@@ -3,34 +3,11 @@ name: "Test stage"
 on:
   workflow_call:
     inputs:
-      build_datetime:
-        description: "Build datetime, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
-      build_timestamp:
-        description: "Build timestamp, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
-      build_epoch:
-        description: "Build epoch, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
-      nodejs_version:
-        description: "Node.js version, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
       python_version:
         description: "Python version, set by the CI/CD pipeline workflow"
         required: true
         type: string
-      terraform_version:
-        description: "Terraform version, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
-      version:
-        description: "Version of the software, set by the CI/CD pipeline workflow"
-        required: true
-        type: string
+
 
 jobs:
   test-unit:
@@ -40,55 +17,56 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v6
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+      - name: "Install Poetry"
+        shell: bash
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: "Install dependencies"
+        shell: bash
+        run: make dependencies
       - name: "Run unit test suite"
-        run: |
-          make test-unit
-      - name: "Save the result of fast test suite"
-        run: |
-          echo "Nothing to save"
-  test-lint:
-    name: "Linting"
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v6
-      - name: "Run linting"
-        run: |
-          make test-lint
-      - name: "Save the linting result"
-        run: |
-          echo "Nothing to save"
-  test-coverage:
-    name: "Test coverage"
+        shell: bash
+        run: make test-unit
+      - name: "Upload unit test results"
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: unit-test-results
+          path: test-artefacts/
+          retention-days: 30
+      - name: "Publish unit test results to summary"
+        if: always()
+        uses: test-summary/action@31493c76ec9e7aa675f1585d3ed6f1da69269a86  # v2.4
+        with:
+          paths: test-artefacts/unit-tests.xml
+
+  sonarcloud-analysis:
+    name: "SonarCloud Analysis"
     needs: [test-unit]
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v6
-      - name: "Run test coverage check"
-        run: |
-          make test-coverage
-      - name: "Save the coverage check result"
-        run: |
-          echo "Nothing to save"
-  perform-static-analysis:
-    name: "Perform static analysis"
-    needs: [test-unit]
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
     timeout-minutes: 5
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0 # Full history is needed to improving relevancy of reporting
-      - name: "Perform static analysis"
-        uses: ./.github/actions/perform-static-analysis
+          fetch-depth: 0 # Full history is needed for better analysis
+      - name: "Download unit test coverage report"
+        uses: actions/download-artifact@v6
         with:
-          sonar_organisation_key: "${{ vars.SONAR_ORGANISATION_KEY }}"
-          sonar_project_key: "${{ vars.SONAR_PROJECT_KEY }}"
-          sonar_token: "${{ secrets.SONAR_TOKEN }}"
+          name: unit-test-results
+          path: test-artefacts/
+      - name: "SonarCloud Scan"
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANISATION_KEY }}
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+            -Dsonar.python.coverage.reportPaths=test-artefacts/coverage.xml
