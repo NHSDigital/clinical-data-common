@@ -1,6 +1,5 @@
 """Unit tests for the greeting module."""
 
-import pytest
 from clinical_data_common.greeting import get_hello
 
 
